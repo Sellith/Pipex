@@ -6,7 +6,7 @@
 /*   By: lvan-bre <lvan-bre@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 16:37:12 by lvan-bre          #+#    #+#             */
-/*   Updated: 2025/03/11 12:49:44 by lvan-bre         ###   ########.fr       */
+/*   Updated: 2025/03/20 18:20:49 by lvan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	freestruct(t_data *data)
 	int	i;
 
 	if (data->hd == 1)
-		free(data->hd_word);
+		free(data->hd_eof);
 	i = 0;
 	if (data->files != NULL)
 	{
@@ -38,5 +38,17 @@ void	freestruct(t_data *data)
 		while (data->envp != NULL && data->envp[i] != NULL)
 			free(data->envp[i++]);
 		free(data->envp);
+	}
+}
+
+void	freelst(t_list *data)
+{
+	t_list	*tmp;
+
+	while (data != NULL)
+	{
+		tmp = data;
+		free(data);
+		data = tmp->next;
 	}
 }

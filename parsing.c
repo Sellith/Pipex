@@ -6,30 +6,11 @@
 /*   By: lvan-bre <lvan-bre@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:41:08 by lvan-bre          #+#    #+#             */
-/*   Updated: 2025/03/17 14:20:25 by lvan-bre         ###   ########.fr       */
+/*   Updated: 2025/03/20 20:38:03 by lvan-bre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-int	verifyfile(t_data *data)
-{
-	if (access(data->files[0], F_OK) && data->hd == 0)
-	{
-		printf("creating %s", data->files[0]);
-		data->filefd[0] = open(data->files[0], O_CREAT, 0644);
-	}
-	if (access(data->files[1], F_OK))
-	{
-		printf("creating %s", data->files[1]);
-		data->filefd[1] = open(data->files[1], O_CREAT, 0644);
-	}
-	if ((data->hd == 0 && ((access(data->files[0], O_RDONLY))
-				|| access(data->files[1], R_OK))) || (data->hd == 1
-			&& (access(data->files[1], W_OK))))
-		return (perror("Error: File access"), 0);
-	return (1);
-}
 
 int	mallocstruct(t_data *data, char **argv)
 {
@@ -49,8 +30,8 @@ int	mallocstruct(t_data *data, char **argv)
 	data->envp = NULL;
 	if (data->hd == 1)
 	{
-		data->hd_word = ft_strdup(argv[2]);
-		if (data->hd_word == NULL)
+		data->hd_eof = ft_strdup(argv[2]);
+		if (data->hd_eof == NULL)
 			return (0);
 	}
 	return (1);
@@ -80,12 +61,14 @@ int	separate_args(char **argv, char **envp, t_data *data)
 
 	if (mallocstruct(data, argv) == 0)
 		return (0);
+	data->cmdcnt = 0;
 	i = 1;
 	while (i++ + data->hd < data->argc - 1)
 	{
 		data->cmd[i - 2] = ft_strdup(argv[i + data->hd]);
 		if (data->cmd == NULL)
 			return (0);
+		data->cmdcnt++;
 	}
 	data->cmd[i - 2] = NULL;
 	i = 0;
@@ -96,13 +79,12 @@ int	separate_args(char **argv, char **envp, t_data *data)
 	data->envp = ft_split(envp[i] + 5, ':');
 	if (data->envp == NULL)
 		return (0);
-	if (verifyfile(data) == 0)
-		return (0);
 	return (1);
 }
 
 int	parsing(char **argv, char **envp, t_data *data)
 {
+	data->hd = 0;
 	if (ft_strlen(argv[1]) == 8 && ft_strncmp(argv[1], "here_doc", 8) == 0)
 		data->hd = 1;
 	if (data->argc < 4 + data->hd)
